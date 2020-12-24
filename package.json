@@ -1,0 +1,22 @@
+{
+  "name": "agenda-petshop-alura",
+  "version": "1.0.0",
+  "description": "Projeto desenvolvido no curso de NodeJS e Express da Alura",
+  "main": "index.js",
+  "author": "Arthur Olmos Wosniaki",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "consign": "^0.1.6",
+    "express": "^4.17.1",
+    "luxon": "^1.25.0",
+    "mysql": "^2.18.1",
+    "pg": "^8.5.1"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "nodemon": "^2.0.6"
+  }
+}

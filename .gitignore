@@ -1,1 +1,5 @@
 /node_modules
+
+/src/services/node_modules
+
+/src/assets

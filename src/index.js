@@ -1,6 +1,6 @@
 const express = require("./config/express");
-const connection = require("./db/connection");
-const Tables = require("./db/tables");
+const connection = require("./infrastructure/db/connection");
+const Tables = require("./infrastructure/db/tables");
 
 connection.connect((err) => {
   if (err) console.log("Error on connection", err);

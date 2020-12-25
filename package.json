@@ -6,9 +6,11 @@
   "author": "Arthur Olmos Wosniaki",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "debug": "nodemon --inspect src/index.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "consign": "^0.1.6",
     "express": "^4.17.1",
     "luxon": "^1.25.0",

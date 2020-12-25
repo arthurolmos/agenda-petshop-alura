@@ -15,9 +15,9 @@ module.exports = {
   create: (req, res) => {
     const attendance = req.body;
 
-    console.log("attendance", attendance);
-
-    Attendance.create(attendance, res);
+    Attendance.create(attendance)
+      .then((result) => res.status(201).json(result))
+      .catch((err) => res.status(400).json(err));
   },
 
   update: (req, res) => {

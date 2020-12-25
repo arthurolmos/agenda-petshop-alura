@@ -1,9 +1,23 @@
+const convertStringToDate = require("../utils/convertStringToDate");
+const getDateNow = require("../utils/getDateNow");
+
 module.exports = {
   create: (values) => {
-    const { customer, date, now } = values;
+    const { customer, date } = values;
 
-    const validDate = date >= now;
-    const validCustomer = customer.length >= 5;
+    let validDate = false;
+    let validCustomer = false;
+
+    if (date) {
+      const fDate = convertStringToDate(date);
+      const now = getDateNow();
+
+      validDate = fDate >= now;
+    }
+
+    if (customer) {
+      validCustomer = customer.length >= 5;
+    }
 
     const validations = [
       {
@@ -22,13 +36,16 @@ module.exports = {
   },
 
   update: (values) => {
-    const { customer, date, now } = values;
+    const { customer, date } = values;
 
     let validDate = true;
     let validCustomer = true;
 
     if (date) {
-      validDate = date >= now;
+      const fDate = convertStringToDate(date);
+      const now = getDateNow();
+
+      validDate = fDate >= now;
     }
 
     if (customer) {

@@ -14,9 +14,9 @@ routes.patch("/attendances/:id", AttendanceController.update);
 routes.delete("/attendances/:id", AttendanceController.delete);
 
 routes.get("/pets", PetController.index);
-// routes.get("/pets/:id", PetController.findById);
+routes.get("/pets/:id", PetController.findById);
 routes.post("/pets", PetController.create);
-// routes.patch("/pets/:id", PetController.update);
-// routes.delete("/pets/:id", PetController.delete);
+routes.patch("/pets/:id", PetController.update);
+routes.delete("/pets/:id", PetController.delete);
 
 module.exports = routes;

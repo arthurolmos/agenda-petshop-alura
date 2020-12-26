@@ -2,14 +2,18 @@ const Attendance = require("../models/attendance");
 
 module.exports = {
   index: (req, res) => {
-    Attendance.index(res);
+    Attendance.index()
+      .then((result) => res.status(200).json(result))
+      .catch((err) => res.status(400).json(err));
   },
 
   findById: (req, res) => {
     const { id } = req.params;
     const parsedId = parseInt(id);
 
-    Attendance.findById(parsedId, res);
+    Attendance.findById(parsedId)
+      .then((result) => res.status(200).json(result))
+      .catch((err) => res.status(400).json(err));
   },
 
   create: (req, res) => {
@@ -26,13 +30,17 @@ module.exports = {
 
     const values = req.body;
 
-    Attendance.update(parsedId, values, res);
+    Attendance.update(parsedId, values)
+      .then((result) => res.status(200).json(result))
+      .catch((err) => res.status(400).json(err));
   },
 
   delete: (req, res) => {
     const { id } = req.params;
     const parsedId = parseInt(id);
 
-    Attendance.delete(parsedId, res);
+    Attendance.delete(parsedId)
+      .then((result) => res.status(200).json(result))
+      .catch((err) => res.status(400).json(err));
   },
 };

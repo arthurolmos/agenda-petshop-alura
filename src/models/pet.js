@@ -2,103 +2,97 @@ const convertStringToDate = require("../utils/convertStringToDate");
 const getDateNow = require("../utils/getDateNow");
 const connection = require("../infrastructure/db/connection");
 const uploadFile = require("../infrastructure/upload/uploadFile");
+const repo = require("../repositories/pet");
+const removeFile = require("../infrastructure/upload/removeFile");
+const swapFiles = require("../infrastructure/upload/swapFiles");
 // const validate = require("../validations/attendance");
 
 class Attendance {
-  index(res) {
-    const sql = "SELECT * FROM attendances";
+  index() {
+    return repo.index().then((results) => results);
+  }
 
-    connection.query(sql, (err, result) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        res.status(201).json(result);
-      }
+  findById(id) {
+    return repo.findById(id).then((results) => {
+      const attendance = results[0];
+      return attendance;
     });
   }
 
-  findById(id, res) {
-    const sql = `SELECT * FROM attendances WHERE id = ${id}`;
+  create(pet) {
+    return new Promise((resolve, reject) => {
+      uploadFile(pet.image, pet.name, (err, newPath) => {
+        if (err) {
+          reject(err);
+        } else {
+          const createdAt = getDateNow();
 
-    connection.query(sql, (err, result) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        const attendance = result[0];
+          const values = {
+            name: pet.name,
+            image: newPath,
+            createdAt,
+            updatedAt: createdAt,
+          };
 
-        res.status(201).json(attendance);
-      }
+          return repo.create(values).then((results) => {
+            const id = results.insertId;
+
+            resolve({ ...pet, id });
+          });
+        }
+      });
     });
   }
 
-  create(pet, res) {
-    // const validations = validate.create(pet);
+  update(id, values) {
+    const updatedAt = getDateNow();
 
-    // const errors = validations.filter((validation) => !validation.valid);
-    // if (errors.length > 0) {
-    //   res.status(400).json(errors);
-    // } else {
+    if (values.image) {
+      return new Promise((resolve, reject) => {
+        this.findById(id).then((results) => {
+          const pet = results;
+          const path = pet.image;
 
-    uploadFile(pet.image, pet.name, (err, newPath) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        const createdAt = getDateNow();
+          const name = values.name ? values.name : pet.name;
 
-        const values = { name: pet.name, image: newPath, createdAt };
+          return swapFiles(path, values.image, name, (err, newPath) => {
+            if (err) {
+              reject(err);
+            } else {
+              const data = { name, image: newPath, updatedAt };
 
-        const sql = "INSERT INTO pets SET ?";
-
-        connection.query(sql, values, (err, result) => {
-          if (err) {
-            res.status(400).json(err);
-          } else {
-            const id = result.insertId;
-
-            res.status(201).json({ ...pet, id });
-          }
+              return repo.update(id, data).then((results) => {
+                resolve({ ...data, id });
+              });
+            }
+          });
         });
-      }
-    });
-    // }
-  }
-
-  update(id, values, res) {
-    const validations = validate.update(values);
-
-    const errors = validations.filter((validation) => !validation.valid);
-    if (errors.length > 0) {
-      res.status(400).json(errors);
+      });
     } else {
-      const updatedAt = getDateNow();
-
-      if (values.date) {
-        values.date = convertStringToDate(values.date);
-      }
-
       const data = { ...values, updatedAt };
 
-      const sql = `UPDATE attendances SET ? WHERE id = ?`;
-
-      connection.query(sql, [data, id], (err, result) => {
-        if (err) {
-          res.status(400).json(err);
-        } else {
-          res.status(200).json({ ...values, id });
-        }
+      return repo.update(id, data).then((results) => {
+        return { ...data, id };
       });
     }
   }
 
   delete(id, res) {
-    const sql = `DELETE FROM attendances WHERE id = ?`;
+    return new Promise((resolve, reject) => {
+      this.findById(id).then((result) => {
+        const pet = result;
+        const path = pet.image;
 
-    connection.query(sql, id, (err, result) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        res.status(200).json({ id });
-      }
+        return removeFile(path, (err) => {
+          if (err) {
+            return reject(err);
+          } else {
+            return repo.delete(id).then((results) => {
+              resolve({ id });
+            });
+          }
+        });
+      });
     });
   }
 }
